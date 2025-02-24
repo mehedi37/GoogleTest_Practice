@@ -3,4 +3,7 @@ add_library(MyLibrary
     # string_utils.cpp
 )
 
-target_include_directories(MyLibrary PUBLIC ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(MyLibrary
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+)

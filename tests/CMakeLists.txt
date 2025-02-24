@@ -5,6 +5,11 @@ add_executable(RunTests
     # test_string_utils.cpp
 )
 
+target_include_directories(RunTests
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
 target_link_libraries(RunTests
     MyLibrary
     gtest
