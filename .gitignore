@@ -1,0 +1,36 @@
+# Build directory
+.build/
+
+# Compiled files
+*.o
+*.obj
+*.lib
+*.dll
+*.so
+*.a
+*.d
+*.dep
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
+
+# Editor temporary files
+*.swp
+
+# Core dumps
+core.*
+
+# Operating system specific files
+.DS_Store
+Thumbs.db
+
+# CMake
+CMakeCache.txt
+
+# vscode
+.vscode
+
+lib/*
