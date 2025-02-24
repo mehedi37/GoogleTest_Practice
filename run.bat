@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 REM Check for MinGW in common locations
-set "MINGW_PATHS=C:\msys64\mingw64\bin;C:\MinGW\bin;C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin"
+set "MINGW_PATHS=C:\msys64\ucrt64\bin;C:\msys64\mingw64\bin;C:\MinGW\bin;C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin"
 
 for %%p in (%MINGW_PATHS:;= %) do (
     if exist "%%p\g++.exe" (

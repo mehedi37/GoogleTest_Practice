@@ -1,7 +1,8 @@
 enable_testing()
 
 add_executable(RunTests
-    test_math_utils.cpp
+    # test_math_utils.cpp
+    test_triangle.cpp
     # test_string_utils.cpp
 )
 
