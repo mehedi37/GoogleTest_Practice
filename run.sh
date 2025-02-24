@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Color definitions
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 # Exit on any error
 set -e
 
@@ -14,6 +19,10 @@ if [[ ! -x "$0" ]]; then
     exit 1
 fi
 
+echo -e "${GREEN}\t========================================================${NC}"
+echo -e "${GREEN}\t\tBuilding and Testing GoogleTest Project\t\t${NC}"
+echo -e "${GREEN}\t========================================================${NC}"
+
 echo "Cleaning build directory..."
 rm -rf "${build_dir}"
 
@@ -24,13 +33,24 @@ echo "Entering build directory..."
 cd "${build_dir}"
 
 echo "Running CMake..."
-cmake .. || { echo "CMake configuration failed"; exit 1; }
+if ! cmake ..; then
+    echo -e "${RED}CMake configuration failed${NC}"
+    exit 1
+fi
 
 echo "Building project..."
-make || { echo "Build failed"; exit 1; }
+if ! make; then
+    echo -e "${RED}Build failed${NC}"
+    exit 1
+fi
 
 echo "Running tests..."
-cd "${build_dir}/tests/" || { echo "Could not find tests directory"; exit 1; }
+if ! cd "${build_dir}/tests/"; then
+    echo -e "${RED}Could not find tests directory${NC}"
+    exit 1
+fi
 ./RunTests
 
-echo "Build and test completed successfully"
+echo -e "${GREEN}\t========================================================${NC}"
+echo -e "${GREEN}\t\t\tBuild and Test Complete\t\t\t${NC}"
+echo -e "${GREEN}\t========================================================${NC}"
