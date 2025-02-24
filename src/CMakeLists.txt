@@ -1,7 +1,7 @@
 add_library(MyLibrary
     # math_utils.cpp
-    triangle.cpp
-    # string_utils.cpp
+    # triangle.cpp
+    isprime.cpp
 )
 
 target_include_directories(MyLibrary
