@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# Color definitions
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-WHITE='\033[0;37m'
-BOLD='\033[1m'
-NC='\033[0m' # No Color
-
-# Check if terminal supports colors
+# Color definitions using tput for better terminal compatibility
 if [ -t 1 ] && command -v tput >/dev/null && [ "$(tput colors)" -ge 8 ]; then
-    HAS_COLORS=1
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    YELLOW=$(tput setaf 3)
+    BLUE=$(tput setaf 4)
+    MAGENTA=$(tput setaf 5)
+    CYAN=$(tput setaf 6)
+    WHITE=$(tput setaf 7)
+    BOLD=$(tput bold)
+    NC=$(tput sgr0) # Reset
 else
     # No color support
     RED=''
@@ -83,7 +80,7 @@ done
 
 # Show help if requested
 if [ $SHOW_HELP -eq 1 ]; then
-    echo -e "${CYAN}${BOLD}GoogleTest Runner for Linux/Mac - Usage:${NC}"
+    echo -e "${CYAN}${BOLD}GoogleTest Runner for Linux - Usage:${NC}"
     echo
     echo -e "  ${WHITE}$(basename "$0") [options] [test_filter]${NC}"
     echo
@@ -140,6 +137,7 @@ if ! cmake ..; then
 fi
 
 echo -e "${BLUE}Building project...${NC}"
+# Detect number of CPU cores for parallel build
 NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 if ! make -j"$NPROC"; then
     echo -e "${RED}Build failed${NC}"
@@ -163,70 +161,28 @@ fi
 if [ $NON_INTERACTIVE -eq 0 ]; then
     echo -e "${YELLOW}Available tests:${NC}"
 
-    # Get test list and store it
-    ./RunTests --gtest_list_tests > test_list.tmp
-
-    # Create arrays to store test names and display names
-    declare -a test_names
-    declare -a display_names
-
+    # Define hardcoded tests for reliability, similar to run.bat
     # Add "ALL" option
-    test_names[0]="*"
-    display_names[0]="Run ALL tests"
     echo -e "${CYAN}0.${NC} Run ALL tests"
-
-    # Process test list
-    current_suite=""
-    counter=1
-    skip_next=0
-
-    while IFS= read -r line; do
-        # Skip Google Test main line
-        if [[ "$line" == "Running main() from"* ]]; then
-            skip_next=1
-            continue
-        fi
-
-        # Skip the path line after "Running main() from"
-        if [ $skip_next -eq 1 ]; then
-            skip_next=0
-            continue
-        fi
-
-        # If line ends with a period, it's a test suite
-        if [[ "$line" == *. ]]; then
-            # Only consider BaseTest suite
-            if [[ "$line" == "BaseTest." ]]; then
-                current_suite="$line"
-            else
-                current_suite=""
-            fi
-        # It's a test within our target suite
-        elif [[ -n "$current_suite" ]]; then
-            # Trim leading whitespace
-            trimmed_line="${line#"${line%%[![:space:]]*}"}"
-            test_name="${current_suite}${trimmed_line}"
-            test_names[$counter]="$test_name"
-            display_names[$counter]="$test_name"
-            echo -e "${CYAN}${counter}.${NC} ${test_name}"
-            ((counter++))
-        fi
-    done < test_list.tmp
-
-    rm test_list.tmp
+    echo -e "${CYAN}1.${NC} BaseTest.TriangleTypeTest"
+    echo -e "${CYAN}2.${NC} BaseTest.MathUtilsTest"
+    echo -e "${CYAN}3.${NC} BaseTest.TestIsPrime"
 
     # Ask user to select a test
     echo
     read -p $'\e[33mEnter test number to run (0 for all tests):\e[0m ' test_choice
 
-    # Validate input
-    if ! [[ "$test_choice" =~ ^[0-9]+$ ]] || [ "$test_choice" -ge ${#test_names[@]} ]; then
-        echo -e "${RED}Invalid selection. Running all tests.${NC}"
-        test_choice=0
-    fi
-
-    # Set the test filter based on selection
-    TEST_FILTER="--gtest_filter=${test_names[$test_choice]}"
+    # Validate input and set the test filter based on selection
+    case "$test_choice" in
+        0) TEST_FILTER="--gtest_filter=*" ;;
+        1) TEST_FILTER="--gtest_filter=BaseTest.TriangleTypeTest" ;;
+        2) TEST_FILTER="--gtest_filter=BaseTest.MathUtilsTest" ;;
+        3) TEST_FILTER="--gtest_filter=BaseTest.TestIsPrime" ;;
+        *)
+            echo -e "${RED}Invalid selection. Running all tests.${NC}"
+            TEST_FILTER="--gtest_filter=*"
+            ;;
+    esac
 fi
 
 # Run tests with optional filter
