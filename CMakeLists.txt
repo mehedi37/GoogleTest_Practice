@@ -3,21 +3,31 @@ project(MyProject)
 
 set(CMAKE_CXX_STANDARD 17)  # Use modern C++
 
-# Check if offline GoogleTest exists; if not, download the latest version
+# Define the local GoogleTest directory
 set(GTEST_DIR "${CMAKE_SOURCE_DIR}/libs/googletest")
-if(EXISTS ${GTEST_DIR})
-    message(STATUS "Using offline GoogleTest from ${GTEST_DIR}")
-    add_subdirectory(${GTEST_DIR})
-else()
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG main  # Always fetch the latest version
-        DOWNLOAD_EXTRACT_TIMESTAMP true  # Fix timestamp warning
+
+# Check if offline GoogleTest exists; if not, download it
+if(NOT EXISTS ${GTEST_DIR})
+    message(STATUS "GoogleTest not found. Downloading...")
+
+    # Make sure the directory exists
+    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/libs)
+
+    # Use execute_process to run git clone once
+    execute_process(
+        COMMAND git clone https://github.com/google/googletest.git ${GTEST_DIR}
+        RESULT_VARIABLE GIT_RESULT
     )
-    FetchContent_MakeAvailable(googletest)
+
+    if(NOT GIT_RESULT EQUAL "0")
+        message(FATAL_ERROR "Failed to clone GoogleTest repository")
+    endif()
+else()
+    message(STATUS "Using offline GoogleTest from ${GTEST_DIR}")
 endif()
+
+# Always use the local copy
+add_subdirectory(${GTEST_DIR})
 
 # Add src and tests directories
 add_subdirectory(src)

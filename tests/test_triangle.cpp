@@ -2,10 +2,14 @@
 #include "test_base.h"
 
 TEST_F(BaseTest, TriangleTypeTest) {
-    std::cout << "[TEST] Running TriangleTypeTest...\n";
-    EXPECT_EQ(triangleType(3, 4, 5), "Scalene");
-    EXPECT_EQ(triangleType(2, 2, 3), "Isosceles");
-    EXPECT_EQ(triangleType(1, 1, 1), "Equilateral");
-    EXPECT_EQ(triangleType(0, 1, 1), "Not a triangle");
-    EXPECT_EQ(triangleType(1, 1, 1), "Not a triangle");   // Failure case
+    TEST_NAME("TriangleTypeTest");
+    TEST_CASE("Valid triangles");
+    EXPECT_EQ_TRACKED("Scalene", triangleType(3, 4, 5), "3-4-5 should be a scalene triangle");
+    EXPECT_EQ_TRACKED("Isosceles", triangleType(2, 2, 3), "2-2-3 should be an isosceles triangle");
+    EXPECT_EQ_TRACKED("Equilateral", triangleType(1, 1, 1), "1-1-1 should be an equilateral triangle");
+
+    TEST_CASE("Invalid triangles");
+    EXPECT_EQ_TRACKED("Not a triangle", triangleType(0, 1, 1), "0-1-1 should not be a triangle");
+    EXPECT_EQ_TRACKED("Not a triangle", triangleType(1, 2, 3), "1-2-3 should not be a triangle");
+    EXPECT_EQ_TRACKED("Not a triangle", triangleType(-1, 2, 3), "Negative values should not be a triangle");
 }

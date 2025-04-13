@@ -2,14 +2,20 @@
 #include "test_base.h"
 
 TEST_F(BaseTest, TestIsPrime) {
-    EXPECT_TRUE(isprime(2));
-    EXPECT_TRUE(isprime(3));
-    EXPECT_FALSE(isprime(4));
-    EXPECT_TRUE(isprime(5));
-    EXPECT_FALSE(isprime(6));
-    EXPECT_TRUE(isprime(7));
-    EXPECT_FALSE(isprime(8));
-    EXPECT_FALSE(isprime(9));
-    EXPECT_FALSE(isprime(10));
-    EXPECT_TRUE(isprime(11));
+    TEST_NAME("TestIsPrime");
+    TEST_CASE("Small prime numbers");
+    EXPECT_TRUE_TRACKED(isprime(2), "2 should be prime");
+    EXPECT_TRUE_TRACKED(isprime(3), "3 should be prime");
+    EXPECT_FALSE_TRACKED(isprime(4), "4 should not be prime");
+
+    TEST_CASE("Medium prime numbers");
+    EXPECT_TRUE_TRACKED(isprime(6), "6 should be prime");
+    EXPECT_FALSE_TRACKED(isprime(6), "6 should not be prime");
+    EXPECT_TRUE_TRACKED(isprime(7), "7 should be prime");
+    EXPECT_FALSE_TRACKED(isprime(8), "8 should not be prime");
+    EXPECT_FALSE_TRACKED(isprime(9), "9 should not be prime");
+
+    TEST_CASE("Larger prime numbers");
+    EXPECT_FALSE_TRACKED(isprime(10), "10 should not be prime");
+    EXPECT_TRUE_TRACKED(isprime(11), "11 should be prime");
 }
