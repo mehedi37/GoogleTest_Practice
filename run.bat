@@ -21,11 +21,12 @@ set "RESET=%ESC%[0m"
 
 REM Parse command line arguments
 set CLEAN_BUILD=0
-set TEST_FILTER=
+set TEST_FILTER=--gtest_filter=*
 
 if "%1"=="--clean" set CLEAN_BUILD=1
 if "%1"=="--help" goto show_help
 if "%1"=="--list" set LIST_TESTS=1
+if "%1"=="--filter" set "TEST_FILTER=--gtest_filter=%2"
 
 echo %CYAN%GoogleTest Runner for Windows%RESET%
 echo.
@@ -97,30 +98,7 @@ if defined LIST_TESTS (
     exit /b 0
 )
 
-REM Using a hard-coded menu approach instead of dynamic parsing to avoid syntax issues
-echo %YELLOW%Available tests:%RESET%
-echo %CYAN%0.%RESET% Run ALL tests
-echo %CYAN%1.%RESET% BaseTest.TriangleTypeTest
-echo %CYAN%2.%RESET% BaseTest.MathUtilsTest
-echo %CYAN%3.%RESET% BaseTest.TestIsPrime
-
-echo.
-set /p TEST_CHOICE="%YELLOW%Enter test number to run (0 for all tests):%RESET% "
-
-if "%TEST_CHOICE%"=="0" (
-    set "TEST_FILTER=--gtest_filter=*"
-) else if "%TEST_CHOICE%"=="1" (
-    set "TEST_FILTER=--gtest_filter=BaseTest.TriangleTypeTest"
-) else if "%TEST_CHOICE%"=="2" (
-    set "TEST_FILTER=--gtest_filter=BaseTest.MathUtilsTest"
-) else if "%TEST_CHOICE%"=="3" (
-    set "TEST_FILTER=--gtest_filter=BaseTest.TestIsPrime"
-) else (
-    echo %RED%Invalid selection. Running all tests.%RESET%
-    set "TEST_FILTER=--gtest_filter=*"
-)
-
-REM Run tests with the chosen filter
+REM Run tests directly with the filter
 echo %BLUE%Running tests with filter: %TEST_FILTER%%RESET%
 RunTests.exe %TEST_FILTER% || (
     echo %RED%Tests failed!%RESET%
@@ -137,8 +115,9 @@ echo.
 echo   %WHITE%run.bat [options]%RESET%
 echo.
 echo %CYAN%Options:%RESET%
-echo   %WHITE%--clean%RESET% Perform a clean build (delete .build folder)
-echo   %WHITE%--list %RESET% List all available tests
-echo   %WHITE%--help %RESET% Show this help message
+echo   %WHITE%--clean%RESET%        Perform a clean build (delete .build folder)
+echo   %WHITE%--list %RESET%        List all available tests
+echo   %WHITE%--filter PATTERN%RESET% Run tests matching PATTERN
+echo   %WHITE%--help %RESET%        Show this help message
 echo.
 exit /b 0

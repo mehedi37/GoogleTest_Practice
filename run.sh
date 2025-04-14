@@ -30,10 +30,9 @@ build_dir="${base_dir}/.build"
 
 # Parse command line arguments
 CLEAN_BUILD=0
-TEST_FILTER=""
+TEST_FILTER="--gtest_filter=*"
 LIST_TESTS=0
 SHOW_HELP=0
-NON_INTERACTIVE=0
 
 # Process arguments
 while [ $# -gt 0 ]; do
@@ -47,18 +46,11 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         --filter)
-            if [ -n "$TEST_FILTER" ]; then
-                echo -e "${RED}Cannot specify multiple test filters${NC}"
-                SHOW_HELP=1
-                break
-            fi
             TEST_FILTER="--gtest_filter=$2"
-            NON_INTERACTIVE=1
             shift 2
             ;;
         --all)
             TEST_FILTER="--gtest_filter=*"
-            NON_INTERACTIVE=1
             shift
             ;;
         --help)
@@ -66,13 +58,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         *)
-            if [ -n "$TEST_FILTER" ]; then
-                echo -e "${RED}Cannot specify multiple test filters${NC}"
-                SHOW_HELP=1
-                break
-            fi
             TEST_FILTER="--gtest_filter=$1"
-            NON_INTERACTIVE=1
             shift
             ;;
     esac
@@ -92,8 +78,8 @@ if [ $SHOW_HELP -eq 1 ]; then
     echo -e "  ${WHITE}--help${NC}         Show this help message"
     echo
     echo -e "${CYAN}${BOLD}Examples:${NC}"
-    echo -e "  ${WHITE}./run.sh${NC}                        Run tests interactively"
-    echo -e "  ${WHITE}./run.sh --clean${NC}                Clean build and run tests interactively"
+    echo -e "  ${WHITE}./run.sh${NC}                        Run all tests"
+    echo -e "  ${WHITE}./run.sh --clean${NC}                Clean build and run all tests"
     echo -e "  ${WHITE}./run.sh --list${NC}                 List all tests"
     echo -e "  ${WHITE}./run.sh TriangleTypeTest.*${NC}     Run all tests in TriangleTypeTest"
     echo -e "  ${WHITE}./run.sh \"*.HandlesZeroInput\"${NC}   Run all tests named HandlesZeroInput"
@@ -157,39 +143,7 @@ if [ $LIST_TESTS -eq 1 ]; then
     exit 0
 fi
 
-# Show interactive menu if no filter was provided
-if [ $NON_INTERACTIVE -eq 0 ]; then
-    echo -e "${YELLOW}Available tests:${NC}"
-
-    # Define hardcoded tests for reliability, similar to run.bat
-    # Add "ALL" option
-    echo -e "${CYAN}0.${NC} Run ALL tests"
-    echo -e "${CYAN}1.${NC} BaseTest.TriangleTypeTest"
-    echo -e "${CYAN}2.${NC} BaseTest.MathUtilsTest"
-    echo -e "${CYAN}3.${NC} BaseTest.TestIsPrime"
-
-    # Ask user to select a test
-    echo
-    read -p $'\e[33mEnter test number to run (0 for all tests):\e[0m ' test_choice
-
-    # Validate input and set the test filter based on selection
-    case "$test_choice" in
-        0) TEST_FILTER="--gtest_filter=*" ;;
-        1) TEST_FILTER="--gtest_filter=BaseTest.TriangleTypeTest" ;;
-        2) TEST_FILTER="--gtest_filter=BaseTest.MathUtilsTest" ;;
-        3) TEST_FILTER="--gtest_filter=BaseTest.TestIsPrime" ;;
-        *)
-            echo -e "${RED}Invalid selection. Running all tests.${NC}"
-            TEST_FILTER="--gtest_filter=*"
-            ;;
-    esac
-fi
-
-# Run tests with optional filter
-if [ -z "$TEST_FILTER" ]; then
-    TEST_FILTER="--gtest_filter=*"
-fi
-
+# Run tests with filter
 echo -e "${BLUE}Running tests with filter: ${WHITE}${TEST_FILTER}${NC}"
 if ! ./RunTests $TEST_FILTER; then
     echo -e "${RED}Tests failed!${NC}"
