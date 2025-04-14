@@ -2,7 +2,6 @@
 #include<string>
 using namespace std;
 
-
 string maxnumber(int a, int b, int c) {
   if (a > b && a > c) {
     return to_string(a) + " is the largest number";
