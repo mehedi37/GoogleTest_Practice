@@ -21,6 +21,8 @@ build/
 # Editor temporary files
 *.swp
 
+*.exe
+
 # Core dumps
 core.*
 
